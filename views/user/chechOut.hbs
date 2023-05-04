@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+    <title>Document</title>
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity=
+        "sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" 
+        crossorigin="anonymous">
+    </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        .box{
+            width: 50%;
+            height: 400px;
+            border: 1px solid black;
+            margin: auto;
+            margin-top: 15%;
+            padding: 20px;
+            background-image: url(https://www.knowyourpayments.com/wp-content/uploads/2016/05/transaction-basics-icon@2x-1.png);
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        }
+        .box h1{
+
+                background-color: black;
+                text-align: center;
+                color: white;
+                box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        }
+        .box h3{
+            padding: 20px;
+        }
+        .btnPay{
+            margin: auto;
+            background-color: green;
+            border: none;
+            color: white;
+        }
+        #amount{
+            background-color: black;
+            color: white;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    {{!-- {{>userNav}} --}}
+    <div class="box">
+                <h1><b><i>PAYMENT</i></b></h1>
+                <h3><b><i style="background-color: blueviolet;">Payment ID</i></b>&nbsp;: <span id="id">{{order.id}}</span></h3>
+                <h3><b><i style="background-color: blueviolet;"></i></b>&nbsp;: <span id="amount">{{order.amount}}</span> </h3>
+                <button id="rzp-button1" class="btnPay">Pay Now</button>
+    </div>
+
+    <script>
+
+  
+
+    var amount = document.getElementById("amount").innerHTML;
+    var id = document.getElementById("id").innerHTML;
+    
+    console.log(amount)
+var options = {
+    "key": "rzp_test_W8RGjInsDaKQiY", // Enter the Key ID generated from the Dashboard
+    "amount": parseInt(amount)*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "image": "https://media-exp1.licdn.com/dms/image/C5603AQFAJWGquGFbjA/profile-displayphoto-shrink_100_100/0/1632547582083?e=2147483647&v=beta&t=sD7MFIBmuK8nj3F1Go9K4GK_YGsE1HsHI8WOHgUtBs0",
+    "order_id":id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+       varifyPAy(response,amount,id);
+    },
+    "prefill": {
+        "name": "anaz k sunil",
+        "email": "anazksunil2@gmail.com",
+        "contact": "9999999999"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "red"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+});
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+function varifyPAy(response,amount,id)
+{
+    console.log(response,"response")
+    console.log("toamnt",amount)
+$.post("/varify",
+         data={
+           response,
+           amount,
+           id
+         },
+         function (data, status) {
+            console.log(data);
+            window.location.href="/"
+         });
+}
+
+    </script>
+</body>
+</html>

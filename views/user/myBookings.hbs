@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+     <style>
+        .top{
+  width: 60%;
+  height: 100px;
+  background-color: #ddd;
+  margin-top: 10%;
+}
+.gioBtn{
+    border: none;
+    background-color: aqua;
+    border-radius: 10px;
+}
+.map{
+    margin-top: 10%;
+}
+     </style>
+    {{>userNav}}
+
+
+         
+{{#each bookings}}
+
+    <div class="mainDiv" style="margin-top:13%;">
+            <div class="left" style="padding: 20px;">
+                <img src="https://play-lh.googleusercontent.com/eJuvWSnbPwEWAQCYwl8i9nPJXRzTv94JSYGGrKIu0qeuG_5wgYtb982-2F_jOGtIytY" alt="">
+            </div>
+            <div class="right">
+
+                 <div class="contents" style="padding:20px;margin-top:10%">
+                           <span><B>Application Status:&nbsp;<span style="color:green">{{status}}</span><span></span> By Agemt</B> </span> <br>
+                           <span><B>Allowed Visa:&nbsp;{{tickets}}</B></span> <br>
+                            <span><B>Amound Status:&nbsp;<span>{{payment}}</span></B></span> <br>
+                            <span><B>ID:{{_id}}</B></span>
+                             {{!-- <span>Latitude: <b id="lati">{{lati}}</b> </span>
+                             <span>longitude: <b id="longt">{{longti}}</b></span> --}}
+
+                            {{!-- <input type="text" value="{{lati}}" id="lati">
+                            <input type="text" value="{{longti}}"  id="longt"> --}}
+                             <a href="/createOrder/{{Charge}}" class="btn btn-outline-success">Pay Now</a>
+                          </div>
+                         
+                </div>
+                   
+
+            </div>
+    </div>
+    {{/each}}
+
+    <script>
+
+                const button = document.getElementById("gio");
+    var locationDetail;
+button.addEventListener("click", ()=>{
+    if(navigator.geolocation){
+        button.innerText = "Allow gmap to detect location";
+        navigator.geolocation.getCurrentPosition(onSuccess, onError);
+    }else{
+        button.innerText = "Your browser not support";
+    }
+});
+function onSuccess(position){
+      var locationData = document.getElementById('showdata');
+    locationData.innerText = "Detecting your location...";
+   
+   var latitude= document.getElementById("lati").innerHTML;
+   var  longitude =document.getElementById("longt").innerHTML;
+    console.log(longitude);
+    console.log("----------------this is position")
+    //8bb9d1ee2d9743e29d3f1216c002b2f4
+    fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=8cd8f366fda24ba2a495b8520900cc49`)
+    .then(response => response.json()).then(response =>{
+        let allDetails = response.results[0].components;
+        console.table(allDetails);
+        let {suburb, postcode, city} = allDetails;
+        locationDetail =allDetails;
+        locationData.innerText = `${suburb} ${postcode}, ${city}`;
+    }).catch(()=>{
+        button.innerText = "Something went wrong";
+    });
+}
+function onError(error){
+    if(error.code == 1){
+        button.innerText = "You denied the request";
+    }else if(error.code == 2){
+        button.innerText = "Location is unavailable";
+    }else{
+        button.innerText = "Something went wrong";
+    }
+    button.setAttribute("disabled", "true");
+}
+function SearchStation(){
+    console.log("clikced")
+    let locationData;
+    $.post("/users/search-station",
+         data={
+           locationDetail
+         },(data,status)=>{
+            console.log(data)
+            if(data){
+                location.href='/users/searchResult'
+            }
+         });
+}
+
+    </script>
+</body>
+</html>

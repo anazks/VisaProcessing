@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  <style>
+    table{
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+
+    }
+table, td, th {  
+  border: 1px solid #ddd;
+  text-align: left;
+  width: 80%;
+  margin: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 15px;
+}
+.top{
+  width: 60%;
+  height: 100px;
+  margin: auto;
+}
+.locationBTN{
+  border: 1px solid black;
+  background-color: aqua;
+  color: blue;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.gioBtn{
+  border: 1px solid black;
+  background-color: aqua;
+  color: blue;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.tables{
+  padding: 50px;
+}
+</style>
+</head>
+  {{>empNav}}
+<body>
+
+
+    {{!-- <div class="top">
+      <h2 class="heading" style="text-align: center;margin-top:10px; color:white;background-color:black" id="showdata"> KNOW WHERE YOU ARE</h2>
+   
+   <button class="gioBtn"  id="gio">Detect your location</button> 
+    </div> --}}
+
+  
+  <div class="tables">
+     <table>
+  <tr>
+    <th>Ticket</th>
+    <th>UserName</th>
+    <th>Payment</th>
+    
+    <th>Doc1</th>
+    <th>Doc2</th>
+    <th>Doc3</th>
+     <th>Upadate Status</th>
+  </tr>
+  {{#each bookings}}
+  <tr>
+    <td>{{tickets}}</td>
+    <td>{{userName}}</td>
+    <td>{{payment}}</td>
+    <td> <p class="card-text"> <a href="/docs/doc1/{{_id}}.pdf"
+                                            target="_blank"> View Doc</a> <a
+                                            href="/docs/doc2/{{_id}}.pdf" target="_blank" download
+                                            style="color: blue;">
+                                            Download Doc</a></p></td>
+    <td> <p class="card-text"> <a href="/docs/doc3/{{_id}}.pdf"
+                                            target="_blank"> View Doc</a> <a
+                                            href="/docs/doc1/{{_id}}.pdf" target="_blank" download
+                                            style="color: blue;">
+                                            Download Doc</a></p></td>
+    <td> <p class="card-text"> <a href="/docs/doc1/{{_id}}.pdf"
+                                            target="_blank"> View Doc</a> <a
+                                            href="/docs/doc1/{{_id}}.pdf" target="_blank" download
+                                            style="color: blue;">
+                                            Download Doc</a></p></td>
+    <td>{{status}}</td>
+    <td>
+        <form action="/users/location_add" method="post">
+          <input type="hidden"  name="lati" id="lati">
+          <input type="hidden"  id="longti" name="longti">
+          <input type="hidden"  name="id" value="{{_id}}">
+          <input type="submit" value="Varify"  class="locationBTN"> 
+        </form>
+    </td>
+  </tr>
+{{/each}}
+</table>
+  </div>
+
+
+  
+</div>
+
+
+<script>
+      const button = document.getElementById("gio");
+    var locationDetail;
+button.addEventListener("click", ()=>{
+    if(navigator.geolocation){
+        button.innerText = "Allow gmap to detect location";
+        navigator.geolocation.getCurrentPosition(onSuccess, onError);
+    }else{
+        button.innerText = "Your browser not support";
+    }
+});
+function onSuccess(position){
+      var locationData = document.getElementById('showdata');
+    locationData.innerText = "Detecting your location...";
+    let {latitude, longitude} = position.coords;
+    console.log(latitude);
+    document.getElementById("lati").value =latitude ;
+    document.getElementById("longti").value =latitude ;
+    console.log(longitude);
+    console.log("----------------this is position")
+    //8bb9d1ee2d9743e29d3f1216c002b2f4
+    fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=8cd8f366fda24ba2a495b8520900cc49`)
+    .then(response => response.json()).then(response =>{
+        let allDetails = response.results[0].components;
+        console.table(allDetails);
+        let {suburb, postcode, city} = allDetails;
+        locationDetail =allDetails;
+        locationData.innerText = `${suburb} ${postcode}, ${city}`;
+    }).catch(()=>{
+        button.innerText = "Something went wrong";
+    });
+}
+function onError(error){
+    if(error.code == 1){
+        button.innerText = "You denied the request";
+    }else if(error.code == 2){
+        button.innerText = "Location is unavailable";
+    }else{
+        button.innerText = "Something went wrong";
+    }
+    button.setAttribute("disabled", "true");
+}
+function SearchStation(){
+    console.log("clikced")
+    let locationData;
+    $.post("/users/search-station",
+         data={
+           locationDetail
+         },(data,status)=>{
+            console.log(data)
+            if(data){
+                location.href='/users/searchResult'
+            }
+         });
+}
+</script>
+</body>
+</html>

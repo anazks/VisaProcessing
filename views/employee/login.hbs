@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong>Holy {{alert}}!</strong> You should check in on some of those fields below.
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+    <div class="login-page">
+  <div class="form">
+    <form class="login-form" action="/users/Login" method="post">
+      <input type="text" name="email" placeholder="email"/>
+      <input type="password" name="password" placeholder="password"/>
+      <button>login</button>
+      <p class="message">Not registered? <a href="/users/Register">Create an account</a></p>
+      <p class="message">back to Home<a href="/">Home</a></p>
+    </form>
+  </div>
+</div> 
+</body>
+</html>
