@@ -23,6 +23,10 @@ const bookingModel = new mongoose.Schema({
         type: String,
         required: [true, "Must Provide userName"],
     },
+    usermail: {
+        type: String,
+        required: [true, "Must Provide usermail"],
+    },
     status: {
         type: String,
         required: [true, "Must Provide status"],

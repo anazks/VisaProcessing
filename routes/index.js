@@ -93,8 +93,10 @@ router.post('/book_Now', async(req,res)=>{
         console.log(req.body)
             let userId = req.session.user._id;
             let userName= req.session.user.userName;
+            let useremail = req.session.user.email;
            req.body.userId =userId;
            req.body.userName=userName;
+           req.body.usermail = useremail;
           console.log(req.body,"for db")
             var availableSeat =parseInt(req.body.availableSeat);
             var ticket = req.body.tickets
